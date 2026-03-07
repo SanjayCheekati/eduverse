@@ -489,67 +489,66 @@ eduverse/
 
 ---
 
-## 🌐 Deployment Guide (Vercel + Render)
+## 🌐 Deployment Guide (Both on Vercel)
 
-The app is deployed as **two services**:
-- **Frontend** (React) → **Vercel** (static site)
-- **Backend** (Express + Socket.IO) → **Render** (web service)
+The app is deployed as **two separate Vercel projects**:
+- **Backend** (Express API) → Vercel Serverless Functions
+- **Frontend** (React SPA) → Vercel Static Site
 
-> Vercel's serverless functions don't support persistent WebSocket connections (Socket.IO), so the backend runs on Render's free tier instead.
+> **Note:** Socket.IO (real-time chat) does not work on Vercel serverless. All other features (auth, courses, enrollments, quizzes, etc.) work perfectly.
 
 ---
 
-### Step 1: Deploy the Backend on Render
+### Step 1: Deploy the Backend on Vercel
 
-1. Go to [render.com](https://render.com/) and sign in with GitHub
-2. Click **New → Web Service**
-3. Connect your GitHub repo (`SanjayCheekati/eduverse`)
-4. Configure the service:
+1. Go to [vercel.com](https://vercel.com/) and sign in with GitHub
+2. Click **Add New → Project** → Import your repo (`SanjayCheekati/eduverse`)
+3. Configure the project:
 
    | Setting | Value |
    |:--|:--|
-   | **Name** | `eduverse-api` |
+   | **Project Name** | `eduverse-api` |
    | **Root Directory** | `server` |
-   | **Runtime** | Node |
-   | **Build Command** | `npm install` |
-   | **Start Command** | `node server.js` |
+   | **Framework Preset** | Other |
 
-5. Add **Environment Variables** (under "Environment"):
+   > Leave Build Command and Output Directory empty — Vercel auto-detects from `vercel.json`.
+
+4. Add **Environment Variables**:
 
    ```
    NODE_ENV=production
-   PORT=5000
    MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/elearning_lms
    JWT_SECRET=<your-strong-secret-key>
    JWT_EXPIRE=30d
    FIREBASE_PROJECT_ID=<your-firebase-project-id>
-   CLIENT_URL=https://your-app-name.vercel.app
+   CLIENT_URL=https://eduverse.vercel.app
    ```
 
-   > Replace `CLIENT_URL` with your actual Vercel frontend URL after Step 2. You can update it later.
+   > Set `CLIENT_URL` to your frontend Vercel URL (you'll create it in Step 2 — update this after).
 
-6. Click **Create Web Service** — Render will build and deploy automatically
-7. Copy the deployed URL (e.g., `https://eduverse-api.onrender.com`)
+5. Click **Deploy**
+6. Copy the deployed URL (e.g., `https://eduverse-api.vercel.app`)
+7. Verify it works: visit `https://eduverse-api.vercel.app/api/health`
 
 ---
 
 ### Step 2: Deploy the Frontend on Vercel
 
-1. Go to [vercel.com](https://vercel.com/) and sign in with GitHub
-2. Click **Add New → Project** → Import `SanjayCheekati/eduverse`
-3. Configure the project:
+1. Click **Add New → Project** → Import the **same repo** again
+2. Configure the project:
 
    | Setting | Value |
    |:--|:--|
+   | **Project Name** | `eduverse` |
    | **Root Directory** | `client` |
    | **Framework Preset** | Vite |
    | **Build Command** | `npm run build` |
    | **Output Directory** | `dist` |
 
-4. Add **Environment Variables**:
+3. Add **Environment Variables**:
 
    ```
-   VITE_API_URL=https://eduverse-api.onrender.com/api
+   VITE_API_URL=https://eduverse-api.vercel.app/api
    VITE_FIREBASE_API_KEY=your-firebase-api-key
    VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
    VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
@@ -559,21 +558,21 @@ The app is deployed as **two services**:
    VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
    ```
 
-   > Replace `VITE_API_URL` with your Render backend URL from Step 1, **with `/api` at the end**.
+   > `VITE_API_URL` must point to your backend URL from Step 1, **ending with `/api`**.
 
-5. Click **Deploy**
+4. Click **Deploy**
 
 ---
 
 ### Step 3: Update CORS & Firebase
 
-1. **Update Render's `CLIENT_URL`**: Go to Render → your service → Environment → set `CLIENT_URL` to your Vercel URL (e.g., `https://eduverse.vercel.app`)
+1. **Update backend `CLIENT_URL`**: Go to Vercel → `eduverse-api` project → Settings → Environment Variables → set `CLIENT_URL` to your frontend URL (e.g., `https://eduverse.vercel.app`). Then redeploy.
 
 2. **Update Firebase authorized domains**:
    - Go to [Firebase Console](https://console.firebase.google.com/) → Authentication → Settings → Authorized domains
-   - Add your Vercel domain (e.g., `eduverse.vercel.app`)
+   - Add both domains: `eduverse.vercel.app` and `eduverse-api.vercel.app`
 
-3. **Redeploy** both services after updating environment variables
+3. **Redeploy** the backend after updating `CLIENT_URL`
 
 ---
 
@@ -590,13 +589,15 @@ node seed.js
 
 ### Deployment Checklist
 
-- [ ] MongoDB Atlas cluster is set up with network access allowed (`0.0.0.0/0` or Render IPs)
-- [ ] Backend deployed on Render with all env vars
-- [ ] Frontend deployed on Vercel with `VITE_API_URL` pointing to Render
-- [ ] `CLIENT_URL` on Render points back to Vercel URL
-- [ ] Firebase authorized domains include the Vercel domain
+- [ ] MongoDB Atlas cluster is set up with network access allowed (`0.0.0.0/0`)
+- [ ] Backend deployed on Vercel with `server` as root directory
+- [ ] `https://eduverse-api.vercel.app/api/health` returns `{"status":"OK"}`
+- [ ] Frontend deployed on Vercel with `client` as root directory
+- [ ] `VITE_API_URL` on frontend points to backend (`https://..../api`)
+- [ ] `CLIENT_URL` on backend points to frontend URL
+- [ ] Firebase authorized domains include both Vercel domains
 - [ ] `JWT_SECRET` is a strong, unique value (not the default)
-- [ ] Tested login, course browsing, enrollment, and chat on production
+- [ ] Tested login, course browsing, and enrollment on production
 
 ---
 
