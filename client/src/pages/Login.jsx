@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, LogIn, GraduationCap, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, GraduationCap, Sparkles, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { loginUser, googleAuth } from '../utils/api';
 import toast from 'react-hot-toast';
@@ -10,10 +10,16 @@ import GlowOrbs from '../components/ui/GlowOrbs';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
 
+const roles = [
+  { value: 'student', label: 'Student', icon: BookOpen, desc: 'Learn and grow' },
+  { value: 'instructor', label: 'Instructor', icon: GraduationCap, desc: 'Teach and inspire' },
+];
+
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [role, setRole] = useState('student');
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -60,6 +66,31 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Role selector */}
+            <div>
+              <label className="block text-sm font-medium text-white/60 mb-2">I am a</label>
+              <div className="grid grid-cols-2 gap-3">
+                {roles.map((r) => (
+                  <button
+                    type="button"
+                    key={r.value}
+                    onClick={() => setRole(r.value)}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                      role === r.value
+                        ? 'border-primary-500/40 bg-primary-500/10 text-white'
+                        : 'border-white/5 bg-white/[0.02] text-white/40 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <r.icon className={`w-5 h-5 ${role === r.value ? 'text-primary-400' : ''}`} />
+                    <div className="text-left">
+                      <p className="text-sm font-medium">{r.label}</p>
+                      <p className="text-[10px] opacity-50">{r.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="flex justify-center">
               <button
                 type="button"
@@ -68,7 +99,7 @@ const Login = () => {
                   try {
                     const result = await signInWithPopup(auth, googleProvider);
                     const idToken = await result.user.getIdToken();
-                    const { data } = await googleAuth({ credential: idToken });
+                    const { data } = await googleAuth({ credential: idToken, role });
                     login(data.user, data.token);
                     toast.success(`Welcome back, ${data.user.name}!`);
                     const routes = { student: '/student', instructor: '/instructor', admin: '/admin' };
