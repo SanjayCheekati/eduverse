@@ -11,7 +11,10 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token && user) {
-      const newSocket = io(window.location.origin, {
+      const socketUrl = import.meta.env.VITE_API_URL
+        ? import.meta.env.VITE_API_URL.replace('/api', '')
+        : window.location.origin;
+      const newSocket = io(socketUrl, {
         auth: { token },
         transports: ['websocket', 'polling']
       });

@@ -41,11 +41,11 @@
 - **Interactive Course Player** — video lessons with module-by-module navigation
 - **Progress Tracking** — automatic lesson completion tracking with visual progress bars
 - **Certificates** — auto-generated completion certificates with unique verification
-- **Wishlist & Cart** — save courses for later or add to cart
+- **Wishlist & Cart** — save courses for later or enroll directly
 - **Reviews & Ratings** — rate and review completed courses
 
 ### 👨‍🏫 Instructor Portal
-- **Instructor Dashboard** with revenue analytics and student engagement metrics
+- **Instructor Dashboard** with student engagement metrics
 - **Course Builder** — create courses with modules, lessons, video content, and assignments
 - **Submission Review** — review and grade student assignment submissions
 - **Analytics** — detailed charts for enrollment trends, ratings, and course performance
@@ -54,7 +54,7 @@
 - **Admin Dashboard** with platform-wide metrics and KPIs
 - **User Management** — view, search, and manage all platform users
 - **Course Oversight** — monitor all courses across the platform
-- **Platform Analytics** — enrollment trends, revenue reports, and usage statistics
+- **Platform Analytics** — enrollment trends and usage statistics
 
 ### 💬 Real-Time Chat
 - **Live messaging** powered by Socket.IO
@@ -126,7 +126,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        CLIENT (React + Vite)                    │
+│                     CLIENT (React + Vite)                       │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐   │
 │  │  Pages   │  │Components│  │ Context  │  │  Firebase    │   │
 │  │(Student, │  │(Navbar,  │  │(Auth,    │  │  (Google     │   │
@@ -138,10 +138,10 @@
 │                           │  Axios + Socket.IO                  │
 └───────────────────────────┼─────────────────────────────────────┘
                             │
-                    ┌───────▼───────┐
-                    │   Vite Proxy  │
-                    │  /api → :5000 │
-                    └───────┬───────┘
+              ┌─────────────┼─────────────┐
+              │ Dev: Vite Proxy (/api→:5000)│
+              │ Prod: VITE_API_URL env var │
+              └─────────────┬─────────────┘
                             │
 ┌───────────────────────────┼─────────────────────────────────────┐
 │                    SERVER (Express + Node.js)                    │
@@ -157,8 +157,7 @@
                             │
                     ┌───────▼───────┐
                     │   MongoDB     │
-                    │  (Atlas or    │
-                    │   Local)      │
+                    │   (Atlas)     │
                     └───────────────┘
 ```
 
@@ -490,14 +489,114 @@ eduverse/
 
 ---
 
-## 🌐 Deployment Notes
+## 🌐 Deployment Guide (Vercel + Render)
 
-- Set `NODE_ENV=production` in server environment
-- Build the client: `cd client && npm run build`
-- Serve the `client/dist` folder via Express or a CDN
-- Use **MongoDB Atlas** for cloud database
-- Configure Firebase authorized domains for production URL
-- Set a strong, unique `JWT_SECRET`
+The app is deployed as **two services**:
+- **Frontend** (React) → **Vercel** (static site)
+- **Backend** (Express + Socket.IO) → **Render** (web service)
+
+> Vercel's serverless functions don't support persistent WebSocket connections (Socket.IO), so the backend runs on Render's free tier instead.
+
+---
+
+### Step 1: Deploy the Backend on Render
+
+1. Go to [render.com](https://render.com/) and sign in with GitHub
+2. Click **New → Web Service**
+3. Connect your GitHub repo (`SanjayCheekati/eduverse`)
+4. Configure the service:
+
+   | Setting | Value |
+   |:--|:--|
+   | **Name** | `eduverse-api` |
+   | **Root Directory** | `server` |
+   | **Runtime** | Node |
+   | **Build Command** | `npm install` |
+   | **Start Command** | `node server.js` |
+
+5. Add **Environment Variables** (under "Environment"):
+
+   ```
+   NODE_ENV=production
+   PORT=5000
+   MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/elearning_lms
+   JWT_SECRET=<your-strong-secret-key>
+   JWT_EXPIRE=30d
+   FIREBASE_PROJECT_ID=<your-firebase-project-id>
+   CLIENT_URL=https://your-app-name.vercel.app
+   ```
+
+   > Replace `CLIENT_URL` with your actual Vercel frontend URL after Step 2. You can update it later.
+
+6. Click **Create Web Service** — Render will build and deploy automatically
+7. Copy the deployed URL (e.g., `https://eduverse-api.onrender.com`)
+
+---
+
+### Step 2: Deploy the Frontend on Vercel
+
+1. Go to [vercel.com](https://vercel.com/) and sign in with GitHub
+2. Click **Add New → Project** → Import `SanjayCheekati/eduverse`
+3. Configure the project:
+
+   | Setting | Value |
+   |:--|:--|
+   | **Root Directory** | `client` |
+   | **Framework Preset** | Vite |
+   | **Build Command** | `npm run build` |
+   | **Output Directory** | `dist` |
+
+4. Add **Environment Variables**:
+
+   ```
+   VITE_API_URL=https://eduverse-api.onrender.com/api
+   VITE_FIREBASE_API_KEY=your-firebase-api-key
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+   VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+   VITE_FIREBASE_APP_ID=your-app-id
+   VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
+
+   > Replace `VITE_API_URL` with your Render backend URL from Step 1, **with `/api` at the end**.
+
+5. Click **Deploy**
+
+---
+
+### Step 3: Update CORS & Firebase
+
+1. **Update Render's `CLIENT_URL`**: Go to Render → your service → Environment → set `CLIENT_URL` to your Vercel URL (e.g., `https://eduverse.vercel.app`)
+
+2. **Update Firebase authorized domains**:
+   - Go to [Firebase Console](https://console.firebase.google.com/) → Authentication → Settings → Authorized domains
+   - Add your Vercel domain (e.g., `eduverse.vercel.app`)
+
+3. **Redeploy** both services after updating environment variables
+
+---
+
+### Step 4: Seed the Production Database (Optional)
+
+```bash
+# Set your production MongoDB URI temporarily
+export MONGO_URI="mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/elearning_lms"
+cd server
+node seed.js
+```
+
+---
+
+### Deployment Checklist
+
+- [ ] MongoDB Atlas cluster is set up with network access allowed (`0.0.0.0/0` or Render IPs)
+- [ ] Backend deployed on Render with all env vars
+- [ ] Frontend deployed on Vercel with `VITE_API_URL` pointing to Render
+- [ ] `CLIENT_URL` on Render points back to Vercel URL
+- [ ] Firebase authorized domains include the Vercel domain
+- [ ] `JWT_SECRET` is a strong, unique value (not the default)
+- [ ] Tested login, course browsing, enrollment, and chat on production
 
 ---
 
