@@ -117,7 +117,7 @@ const ManageCourses = () => {
                     <div className="flex items-center gap-4 text-xs text-white/30">
                       <span>{course.category}</span>
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {course.enrollmentCount || 0}</span>
-                      <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400" /> {course.rating?.toFixed(1) || '—'}</span>
+                      <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400" /> {course.rating?.average?.toFixed(1) || '—'}</span>
                       <span>{course.totalLessons || 0} lessons</span>
                     </div>
                   </div>

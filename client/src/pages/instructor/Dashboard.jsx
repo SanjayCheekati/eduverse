@@ -133,7 +133,7 @@ const InstructorDashboard = () => {
                       <td>
                         <div className="flex items-center gap-1">
                           <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span className="text-sm text-white/60">{course.rating?.toFixed(1) || '—'}</span>
+                          <span className="text-sm text-white/60">{course.rating?.average?.toFixed(1) || '—'}</span>
                         </div>
                       </td>
                       <td>

@@ -106,7 +106,7 @@ const MyCourses = () => {
                   <h3 className="font-semibold text-white mt-1 mb-2 line-clamp-2">{enrollment.course?.title}</h3>
 
                   <div className="flex items-center gap-4 text-xs text-white/30 mb-4">
-                    <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400" /> {enrollment.course?.rating?.toFixed(1) || '—'}</span>
+                    <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400" /> {enrollment.course?.rating?.average?.toFixed(1) || '—'}</span>
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {enrollment.course?.totalLessons || 0} lessons</span>
                   </div>
 

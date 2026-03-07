@@ -258,7 +258,7 @@ const CourseCatalog = () => {
                         <p className="text-[11px] text-white/25 mb-2">{course.instructor?.name || 'Instructor'}</p>
 
                         <div className="flex items-center gap-1.5 mb-2">
-                          <span className="text-amber-400 font-bold text-xs">{course.rating?.average?.toFixed(1) || course.rating?.toFixed?.(1) || '—'}</span>
+                          <span className="text-amber-400 font-bold text-xs">{course.rating?.average?.toFixed(1) || '—'}</span>
                           <div className="flex gap-0.5">
                             {[1, 2, 3, 4, 5].map(i => {
                               const r = course.rating?.average || course.rating || 0;
