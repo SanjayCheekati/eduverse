@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -38,10 +38,21 @@ const CourseCatalog = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [filterOpen, setFilterOpen] = useState(false);
   const [view, setView] = useState('grid');
+  const searchTimer = useRef(null);
 
   useEffect(() => {
     fetchCourses();
   }, [category, level, sort, page]);
+
+  // Debounced auto-search as user types
+  useEffect(() => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setPage(1);
+      fetchCourses();
+    }, 500);
+    return () => clearTimeout(searchTimer.current);
+  }, [search]);
 
   const fetchCourses = async () => {
     setLoading(true);

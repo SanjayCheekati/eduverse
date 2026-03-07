@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { FullPageLoader } from './components/ui/Loader';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import DashboardLayout from './components/layout/DashboardLayout';
 import Navbar from './components/layout/Navbar';
@@ -122,6 +123,7 @@ function AppRoutes() {
 
 function App() {
   return (
+    <ErrorBoundary>
     <Router>
       <AuthProvider>
         <SocketProvider>
@@ -151,6 +153,7 @@ function App() {
         </SocketProvider>
       </AuthProvider>
     </Router>
+    </ErrorBoundary>
   );
 }
 
