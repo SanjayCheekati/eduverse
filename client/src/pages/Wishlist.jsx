@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ShoppingCart, Star, Users, Trash2, BookOpen } from 'lucide-react';
-import { getWishlist, toggleWishlist, addToCart } from '../utils/api';
+import { Heart, Star, Users, Trash2, BookOpen } from 'lucide-react';
+import { getWishlist, toggleWishlist, enrollCourse } from '../utils/api';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
 import toast from 'react-hot-toast';
@@ -35,12 +35,13 @@ const Wishlist = () => {
     } catch { toast.error('Failed to remove'); }
   };
 
-  const handleAddToCart = async (courseId) => {
+  const handleEnroll = async (courseId) => {
     try {
-      await addToCart(courseId);
-      toast.success('Added to cart!');
+      await enrollCourse(courseId);
+      toast.success('Enrolled successfully!');
+      setItems(prev => prev.filter(c => c._id !== courseId));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add to cart');
+      toast.error(err.response?.data?.message || 'Failed to enroll');
     }
   };
 
@@ -106,9 +107,8 @@ const Wishlist = () => {
 
                       {/* Price & Actions */}
                       <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2 flex-shrink-0">
-                        <span className="text-sm font-semibold text-primary-400">Enroll</span>
-                        <button onClick={() => handleAddToCart(course._id)} className="btn-primary text-xs !py-2 !px-4 flex items-center gap-1.5">
-                          <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                        <button onClick={() => handleEnroll(course._id)} className="btn-primary text-xs !py-2 !px-4 flex items-center gap-1.5">
+                          Enroll Now
                         </button>
                         <button onClick={() => handleRemove(course._id)} className="text-xs text-white/20 hover:text-red-400 transition flex items-center gap-1">
                           <Trash2 className="w-3 h-3" /> Remove

@@ -17,7 +17,6 @@ import CourseDetail from './pages/CourseDetail';
 import Profile from './pages/Profile';
 import Chat from './pages/Chat';
 import Wishlist from './pages/Wishlist';
-import Cart from './pages/Cart';
 
 import StudentDashboard from './pages/student/Dashboard';
 import MyCourses from './pages/student/MyCourses';
@@ -85,7 +84,6 @@ function AppRoutes() {
           <Route path="certificates" element={<Certificates />} />
           <Route path="certificate/:courseId" element={<CertificateView />} />
           <Route path="wishlist" element={<Wishlist />} />
-          <Route path="cart" element={<Cart />} />
         </Route>
 
         {/* Student Learning (full-screen, outside dashboard layout) */}

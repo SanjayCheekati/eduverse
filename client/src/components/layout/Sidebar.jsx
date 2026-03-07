@@ -4,7 +4,7 @@ import {
   LayoutDashboard, BookOpen, GraduationCap, BarChart3, MessageSquare,
   Users, ClipboardList, PlusCircle, Settings, FileText, TrendingUp,
   Award, ShieldCheck, Activity, Library, ChevronLeft, ChevronRight,
-  Heart, ShoppingCart
+  Heart
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
@@ -16,7 +16,6 @@ const menuItems = {
     { label: 'My Courses', to: '/student/my-courses', icon: Library },
     { label: 'My Progress', to: '/student/progress', icon: TrendingUp },
     { label: 'Wishlist', to: '/student/wishlist', icon: Heart },
-    { label: 'Cart', to: '/student/cart', icon: ShoppingCart },
     { label: 'Certificates', to: '/student/certificates', icon: Award },
     { label: 'Chat', to: '/chat', icon: MessageSquare },
   ],

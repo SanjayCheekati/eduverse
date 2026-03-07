@@ -7,7 +7,7 @@ import {
   ShoppingCart, Share2, ThumbsUp, AlertCircle, Monitor, Download,
   Smartphone, Infinity, ChevronRight, MessageSquare, TrendingUp, Zap
 } from 'lucide-react';
-import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist, addToCart } from '../utils/api';
+import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
@@ -108,15 +108,7 @@ const CourseDetail = () => {
     } finally { setEnrollLoading(false); }
   };
 
-  const handleAddToCart = async () => {
-    if (!user) { navigate('/login'); return; }
-    try {
-      await addToCart(id);
-      toast.success('Added to cart!');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add');
-    }
-  };
+
 
   const handleToggleWishlist = async () => {
     if (!user) { navigate('/login'); return; }

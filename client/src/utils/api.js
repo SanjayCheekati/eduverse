@@ -92,12 +92,9 @@ export const updateReview = (id, data) => API.put(`/reviews/${id}`, data);
 export const deleteReview = (id) => API.delete(`/reviews/${id}`);
 export const markReviewHelpful = (id) => API.put(`/reviews/${id}/helpful`);
 
-// Wishlist & Cart
+// Wishlist
 export const getWishlist = () => API.get('/shop/wishlist');
 export const toggleWishlist = (courseId) => API.post(`/shop/wishlist/${courseId}`);
 export const checkWishlist = (courseId) => API.get(`/shop/wishlist/${courseId}/check`);
-export const getCart = () => API.get('/shop/cart');
-export const addToCart = (courseId) => API.post(`/shop/cart/${courseId}`);
-export const removeFromCart = (courseId) => API.delete(`/shop/cart/${courseId}`);
 
 export default API;
