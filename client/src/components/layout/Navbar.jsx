@@ -8,7 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { getNotifications, markAllRead, markNotificationRead } from '../../utils/api';
 
-const Navbar = () => {
+const Navbar = ({ onMenuToggle }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -138,7 +138,7 @@ const Navbar = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute right-0 mt-2 w-80 glass-card p-0 overflow-hidden shadow-2xl z-50"
+                          className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm glass-card p-0 overflow-hidden shadow-2xl z-50"
                         >
                           <div className="flex items-center justify-between p-4 border-b border-white/5">
                             <h3 className="font-semibold text-sm">Notifications</h3>
@@ -235,7 +235,7 @@ const Navbar = () => {
 
               {/* Mobile Hamburger */}
               <button
-                onClick={() => setMobileOpen(!mobileOpen)}
+                onClick={() => { if (onMenuToggle) { onMenuToggle(); } else { setMobileOpen(!mobileOpen); } }}
                 className="lg:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition"
               >
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

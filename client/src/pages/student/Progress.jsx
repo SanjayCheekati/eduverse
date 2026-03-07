@@ -42,7 +42,7 @@ const StudentProgress = () => {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Enrolled', value: stats?.totalEnrolled || enrollments.length, icon: BookOpen, color: 'from-blue-500 to-indigo-600' },
           { label: 'Completed', value: completedCount, icon: Award, color: 'from-emerald-500 to-green-500' },
@@ -104,7 +104,7 @@ const StudentProgress = () => {
                   </p>
                 </div>
 
-                <div className="w-32 flex-shrink-0">
+                <div className="w-full sm:w-32 flex-shrink-0">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className={enrollment.status === 'completed' ? 'text-emerald-400' : 'text-primary-400'}>
                       {enrollment.progress || 0}%

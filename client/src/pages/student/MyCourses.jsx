@@ -50,7 +50,7 @@ const MyCourses = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search courses..."
-              className="glass-input !py-2 pl-9 text-sm w-48"
+              className="glass-input !py-2 pl-9 text-sm w-full sm:w-48"
             />
           </div>
           <select

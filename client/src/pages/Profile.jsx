@@ -109,7 +109,7 @@ const Profile = () => {
       <div className="max-w-2xl mx-auto">
         {/* Header Card */}
         <div className="glass-card mb-6">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
             <div className="relative group">
               <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-500/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/[0.06]">
                 {displayAvatar ? (
@@ -135,9 +135,9 @@ const Profile = () => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-white truncate">{user?.name}</h1>
-              <p className="text-sm text-white/40 truncate">{user?.email}</p>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <h1 className="text-xl font-bold text-white truncate text-center sm:text-left">{user?.name}</h1>
+              <p className="text-sm text-white/40 truncate text-center sm:text-left">{user?.email}</p>
+              <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 flex-wrap">
                 <span className="badge badge-primary capitalize text-xs">{user?.role}</span>
                 <span className="badge badge-success text-xs flex items-center gap-1">
                   <CheckCircle2 className="w-2.5 h-2.5" /> Active

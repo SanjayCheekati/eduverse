@@ -38,7 +38,7 @@ const menuItems = {
   ],
 };
 
-const Sidebar = ({ onCollapseChange }) => {
+const Sidebar = ({ onCollapseChange, mobile, onNavigate }) => {
   const { user } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -50,12 +50,16 @@ const Sidebar = ({ onCollapseChange }) => {
     onCollapseChange?.(next);
   };
 
+  const handleNavClick = () => {
+    if (mobile && onNavigate) onNavigate();
+  };
+
   return (
     <motion.aside
       initial={{ x: -280 }}
-      animate={{ x: 0, width: collapsed ? 72 : 260 }}
+      animate={{ x: 0, width: mobile ? 260 : (collapsed ? 72 : 260) }}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed left-0 top-16 lg:top-[72px] bottom-0 glass-sidebar z-40 flex flex-col overflow-hidden"
+      className={`${mobile ? 'h-full' : 'fixed left-0 top-16 lg:top-[72px] bottom-0 z-40'} glass-sidebar flex flex-col overflow-hidden`}
     >
       {/* Collapse toggle */}
       <button
@@ -76,6 +80,7 @@ const Sidebar = ({ onCollapseChange }) => {
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={handleNavClick}
               className="relative group block"
               end={item.to === '/student' || item.to === '/instructor' || item.to === '/admin'}
             >

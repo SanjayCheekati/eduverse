@@ -87,7 +87,7 @@ const AdminUsers = () => {
             className="glass-input pl-10 w-full"
           />
         </form>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {['', 'student', 'instructor', 'admin'].map((r) => (
             <button
               key={r}
@@ -112,10 +112,10 @@ const AdminUsers = () => {
               <thead>
                 <tr>
                   <th>User</th>
-                  <th>Email</th>
+                  <th className="hidden sm:table-cell">Email</th>
                   <th>Role</th>
-                  <th>Status</th>
-                  <th>Joined</th>
+                  <th className="hidden md:table-cell">Status</th>
+                  <th className="hidden md:table-cell">Joined</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -128,7 +128,7 @@ const AdminUsers = () => {
                         <span className="text-sm font-medium text-white">{user.name}</span>
                       </div>
                     </td>
-                    <td>
+                    <td className="hidden sm:table-cell">
                       <span className="text-sm text-white/50">{user.email}</span>
                     </td>
                     <td>
@@ -138,13 +138,13 @@ const AdminUsers = () => {
                         {user.role}
                       </span>
                     </td>
-                    <td>
+                    <td className="hidden md:table-cell">
                       <span className={`flex items-center gap-1.5 text-xs ${user.isActive ? 'text-emerald-400' : 'text-red-400'}`}>
                         <span className={`w-2 h-2 rounded-full ${user.isActive ? 'bg-emerald-400' : 'bg-red-400'}`} />
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td>
+                    <td className="hidden md:table-cell">
                       <span className="text-xs text-white/30">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </span>

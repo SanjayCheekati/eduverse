@@ -51,15 +51,22 @@ const socketHandler = (io) => {
     });
 
     // Send message
-    socket.on('sendMessage', async ({ room, content, type = 'text' }) => {
+    socket.on('sendMessage', async ({ room, content, type = 'text', fileUrl, fileName, fileType, fileSize }) => {
       try {
-        const message = await Message.create({
+        const msgData = {
           sender: socket.user._id,
           room,
-          content,
+          content: content || '',
           type,
           readBy: [socket.user._id]
-        });
+        };
+        if (type === 'file') {
+          msgData.fileUrl = fileUrl;
+          msgData.fileName = fileName;
+          msgData.fileType = fileType;
+          msgData.fileSize = fileSize;
+        }
+        const message = await Message.create(msgData);
 
         const populated = await Message.findById(message._id)
           .populate('sender', 'name avatar');
@@ -67,6 +74,24 @@ const socketHandler = (io) => {
         io.to(room).emit('newMessage', populated);
       } catch (error) {
         socket.emit('error', { message: 'Failed to send message' });
+      }
+    });
+
+    // Delete message
+    socket.on('deleteMessage', async ({ messageId, room }) => {
+      try {
+        const message = await Message.findById(messageId);
+        if (!message) return socket.emit('error', { message: 'Message not found' });
+
+        // Only the sender or an admin can delete
+        if (message.sender.toString() !== socket.user._id.toString() && socket.user.role !== 'admin') {
+          return socket.emit('error', { message: 'Not authorized to delete this message' });
+        }
+
+        await Message.findByIdAndDelete(messageId);
+        io.to(room).emit('messageDeleted', { messageId });
+      } catch (error) {
+        socket.emit('error', { message: 'Failed to delete message' });
       }
     });
 

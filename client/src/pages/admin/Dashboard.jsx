@@ -127,7 +127,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((s, idx) => (
           <motion.div key={idx} variants={fadeUp}>
             <div className="glass-card group hover:scale-[1.02] transition-transform duration-500">
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
       </motion.div>
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
         <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.3 }}>
           <div className="glass-card">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* User Distribution + Recent Users */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.5 }}>
           <div className="glass-card">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
 
-        <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.6 }} className="lg:col-span-2">
+        <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.6 }} className="md:col-span-2">
           <div className="glass-card">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
               <UserPlus className="w-4 h-4 text-emerald-400" /> Recent Users

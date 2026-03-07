@@ -66,7 +66,7 @@ const InstructorDashboard = () => {
       </div>
 
       {/* Stats */}
-      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((s, idx) => (
           <motion.div key={idx} variants={fadeUp}>
             <div className="glass-card group hover:scale-[1.02] transition-transform duration-500">

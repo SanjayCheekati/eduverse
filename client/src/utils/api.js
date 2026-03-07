@@ -58,6 +58,7 @@ export const getMyCertificates = () => API.get('/enrollments/certificates');
 
 // Upload
 export const uploadAvatar = (formData) => API.post('/upload/avatar', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const uploadChatFile = (formData) => API.post('/upload/chat', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
 // Submissions
 export const createSubmission = (data) => API.post('/submissions', data);

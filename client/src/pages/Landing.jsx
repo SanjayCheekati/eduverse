@@ -146,7 +146,7 @@ const Stats = () => {
           variants={container}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {stats.map((stat, idx) => (
             <motion.div key={idx} variants={scaleIn}>
@@ -460,7 +460,7 @@ const CTA = () => {
 const Footer = () => (
   <footer className="relative border-t border-white/[0.04] py-12">
     <div className="max-w-6xl mx-auto px-4">
-      <div className="grid md:grid-cols-4 gap-8 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
         <div>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center">

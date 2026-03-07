@@ -43,7 +43,7 @@ const InstructorAnalytics = () => {
         <p className="text-white/40 text-sm mt-1">Your teaching performance overview</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {statCards.map((s, idx) => (
           <motion.div
             key={idx}

@@ -7,6 +7,11 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+const chatUploadDir = path.join(__dirname, '..', 'uploads', 'chat');
+if (!fs.existsSync(chatUploadDir)) {
+  fs.mkdirSync(chatUploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
@@ -59,4 +64,41 @@ const uploadAvatar = async (req, res) => {
   }
 };
 
-module.exports = { upload, uploadAvatar };
+// Chat file upload
+const chatStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, chatUploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${req.user._id}-${Date.now()}${ext}`);
+  },
+});
+
+const chatFileFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar|mp4|mp3|svg/;
+  const ext = path.extname(file.originalname).toLowerCase().slice(1);
+  if (allowed.test(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error('File type not allowed'), false);
+  }
+};
+
+const chatUpload = multer({ storage: chatStorage, fileFilter: chatFileFilter, limits: { fileSize: 10 * 1024 * 1024 } });
+
+const uploadChatFile = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
+    const fileUrl = `/uploads/chat/${req.file.filename}`;
+    res.json({
+      fileUrl,
+      fileName: req.file.originalname,
+      fileType: req.file.mimetype,
+      fileSize: req.file.size,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { upload, uploadAvatar, chatUpload, uploadChatFile };

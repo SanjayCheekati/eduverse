@@ -166,7 +166,20 @@ const CourseLearning = () => {
         </button>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile backdrop */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-[5] lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Sidebar - Course Content */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -175,7 +188,7 @@ const CourseLearning = () => {
               animate={{ x: 0 }}
               exit={{ x: -320 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-80 lg:w-[340px] flex-shrink-0 bg-dark-800/50 border-r border-white/[0.04] flex flex-col overflow-hidden absolute lg:relative z-10 h-full"
+              className="w-[85vw] sm:w-80 lg:w-[340px] flex-shrink-0 bg-dark-800/50 border-r border-white/[0.04] flex flex-col overflow-hidden absolute lg:relative z-10 h-full"
             >
               {/* Progress */}
               <div className="p-4 border-b border-white/[0.04]">
@@ -320,13 +333,13 @@ const CourseLearning = () => {
               </div>
 
               {/* Lesson Info */}
-              <div className="p-6 lg:p-8">
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div>
+              <div className="p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                  <div className="min-w-0">
                     <p className="text-xs text-primary-400 font-medium mb-1">
                       Section {currentModuleIdx + 1} — Lesson {currentLessonIdx + 1}
                     </p>
-                    <h2 className="text-xl lg:text-2xl font-bold text-white">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                       {currentLesson.title}
                     </h2>
                     <p className="text-sm text-white/30 mt-1 flex items-center gap-2">
@@ -337,7 +350,7 @@ const CourseLearning = () => {
                   <button
                     onClick={handleMarkComplete}
                     disabled={isCurrentCompleted || completing}
-                    className={`flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition ${
+                    className={`flex-shrink-0 flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium transition ${
                       isCurrentCompleted
                         ? 'bg-emerald-500/10 text-emerald-400 cursor-default'
                         : 'bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/20'

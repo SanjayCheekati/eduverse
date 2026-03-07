@@ -97,7 +97,7 @@ const ManageCourses = () => {
               transition={{ delay: idx * 0.05 }}
             >
               <div className="glass-card hover:border-white/10 transition-all group">
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-3 sm:gap-5">
                   <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
                     {course.thumbnail ? (
                       <img src={course.thumbnail} alt="" className="w-full h-full object-cover rounded-xl" />
@@ -121,7 +121,7 @@ const ManageCourses = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
+                  <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition">
                     <button
                       onClick={() => handleTogglePublish(course._id)}
                       className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition"
