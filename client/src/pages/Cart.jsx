@@ -108,11 +108,7 @@ const Cart = () => {
                         </div>
 
                         <div className="flex sm:flex-col items-center sm:items-end gap-3 flex-shrink-0">
-                          {course.price === 0 ? (
-                            <span className="font-bold text-emerald-400">Free</span>
-                          ) : (
-                            <p className="text-base font-bold text-white">${course.price}</p>
-                          )}
+                          <span className="text-sm font-semibold text-primary-400">Enroll</span>
                           <button onClick={() => handleRemove(course._id)} className="text-xs text-white/20 hover:text-red-400 transition flex items-center gap-1">
                             <Trash2 className="w-3 h-3" /> Remove
                           </button>
@@ -127,12 +123,12 @@ const Cart = () => {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="glass-card border border-white/[0.06] sticky top-24">
-                <h2 className="text-lg font-bold text-white mb-5">Total:</h2>
+                <h2 className="text-lg font-bold text-white mb-5">Summary</h2>
 
                 <div className="space-y-3 mb-5">
                   <div className="border-t border-white/5 pt-3 flex justify-between">
-                    <span className="text-white font-semibold">Total:</span>
-                    <span className="text-2xl font-bold text-white">${totalPrice.toFixed(2)}</span>
+                    <span className="text-white font-semibold">Courses:</span>
+                    <span className="text-2xl font-bold text-white">{cart.length}</span>
                   </div>
                 </div>
 

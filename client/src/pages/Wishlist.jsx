@@ -106,11 +106,7 @@ const Wishlist = () => {
 
                       {/* Price & Actions */}
                       <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2 flex-shrink-0">
-                        {course.price === 0 ? (
-                          <span className="text-lg font-bold text-emerald-400">Free</span>
-                        ) : (
-                          <p className="text-lg font-bold text-white">${course.price}</p>
-                        )}
+                        <span className="text-sm font-semibold text-primary-400">Enroll</span>
                         <button onClick={() => handleAddToCart(course._id)} className="btn-primary text-xs !py-2 !px-4 flex items-center gap-1.5">
                           <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
                         </button>

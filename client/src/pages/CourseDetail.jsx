@@ -517,15 +517,6 @@ const CourseDetail = () => {
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="mb-4">
-                {course.price === 0 ? (
-                  <p className="text-3xl font-bold text-emerald-400">Free</p>
-                ) : (
-                  <p className="text-3xl font-bold text-white">${coursePrice}</p>
-                )}
-              </div>
-
               {/* CTA Buttons */}
               <div className="space-y-2.5 mb-5">
                 {enrolled ? (
@@ -535,7 +526,7 @@ const CourseDetail = () => {
                 ) : (
                   <>
                     <button onClick={handleEnroll} disabled={enrollLoading || user?.role === 'instructor'} className="btn-primary w-full !py-3 flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-50">
-                      {enrollLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : course.price > 0 ? <><ShoppingCart className="w-4 h-4" /> Enroll — ${course.price}</> : 'Enroll Now — It\'s Free'}
+                      {enrollLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : 'Enroll Now'}
                     </button>
 
                   </>

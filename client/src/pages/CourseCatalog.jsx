@@ -275,13 +275,7 @@ const CourseCatalog = () => {
                         </div>
 
                         <div className="mt-auto flex items-center justify-between">
-                          {course.price === 0 ? (
-                            <span className="text-sm font-bold text-emerald-400">Free</span>
-                          ) : (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-base font-bold text-white">${course.price}</span>
-                            </div>
-                          )}
+                          <span className="text-sm font-semibold text-primary-400">Enroll Now</span>
                         </div>
                       </div>
                     </div>
