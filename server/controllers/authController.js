@@ -174,7 +174,10 @@ const googleAuth = async (req, res) => {
         user.googleId = googleId;
         user.authProvider = 'google';
         if (picture && !user.avatar) user.avatar = picture;
-        await user.save({ validateBeforeSave: false });
+      }
+      // Update role if user selected a different one
+      if (role && ['student', 'instructor'].includes(role) && user.role !== 'admin') {
+        user.role = role;
       }
       user.lastLogin = Date.now();
       await user.save({ validateBeforeSave: false });
