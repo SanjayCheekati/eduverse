@@ -22,9 +22,7 @@ const wishlistCartRoutes = require('./routes/wishlistCartRoutes');
 
 const path = require('path');
 const uploadRoutes = require('./routes/uploadRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-const { handleWebhook } = require('./controllers/paymentController');
 
 const app = express();
 const server = http.createServer(app);
@@ -41,9 +39,6 @@ const io = new Server(server, {
 connectDB();
 
 // Middleware
-// Stripe webhook needs raw body - must be before express.json()
-app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), handleWebhook);
-
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
@@ -82,7 +77,6 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/shop', wishlistCartRoutes);
-app.use('/api/payments', paymentRoutes);
 app.use('/api/quizzes', quizRoutes);
 
 // Health check

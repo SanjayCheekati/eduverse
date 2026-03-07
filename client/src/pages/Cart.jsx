@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Star, Trash2, BookOpen, Shield, Tag, CreditCard, Zap } from 'lucide-react';
-import { getCart, removeFromCart, enrollCourse, createCheckoutSession } from '../utils/api';
+import { ShoppingCart, Star, Trash2, BookOpen, Shield, CreditCard, Zap } from 'lucide-react';
+import { getCart, removeFromCart, enrollCourse } from '../utils/api';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
 import toast from 'react-hot-toast';
@@ -40,30 +40,12 @@ const Cart = () => {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      const courseIds = items.map(c => c._id);
-      const freeItems = items.filter(c => !c.price || c.price === 0);
-      const paidItems = items.filter(c => c.price > 0);
-
-      if (paidItems.length > 0) {
-        // Redirect to Stripe Checkout for paid courses
-        const { data } = await createCheckoutSession(courseIds);
-        if (data.free) {
-          // All turned out to be free
-          toast.success(data.message);
-          setItems([]);
-          navigate('/student/my-courses');
-        } else if (data.url) {
-          window.location.href = data.url;
-        }
-      } else {
-        // All free — enroll directly
-        for (const course of freeItems) {
-          await enrollCourse(course._id);
-        }
-        toast.success(`Enrolled in ${freeItems.length} free course(s)!`);
-        setItems([]);
-        navigate('/student/my-courses');
+      for (const course of items) {
+        await enrollCourse(course._id);
       }
+      toast.success(`Enrolled in ${items.length} course(s)!`);
+      setItems([]);
+      navigate('/student/my-courses');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Checkout failed');
     } finally { setCheckingOut(false); }

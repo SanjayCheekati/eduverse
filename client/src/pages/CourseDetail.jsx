@@ -7,7 +7,7 @@ import {
   ShoppingCart, Share2, ThumbsUp, AlertCircle, Monitor, Download,
   Smartphone, Infinity, ChevronRight, MessageSquare, TrendingUp, Zap
 } from 'lucide-react';
-import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist, addToCart, createCheckoutSession } from '../utils/api';
+import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist, addToCart } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
@@ -534,33 +534,10 @@ const CourseDetail = () => {
                   </button>
                 ) : (
                   <>
-                    {course.price > 0 ? (
-                      <button onClick={handleAddToCart} className="btn-primary w-full !py-3 flex items-center justify-center gap-2 text-sm font-semibold">
-                        <ShoppingCart className="w-4 h-4" /> Add to Cart
-                      </button>
-                    ) : (
-                      <button onClick={handleEnroll} disabled={enrollLoading || user?.role === 'instructor'} className="btn-primary w-full !py-3 flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-50">
-                        {enrollLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : 'Enroll Now — It\'s Free'}
-                      </button>
-                    )}
-                    {course.price > 0 && (
-                      <button
-                        onClick={async () => {
-                          if (!user) { navigate('/login'); return; }
-                          setEnrollLoading(true);
-                          try {
-                            const { data } = await createCheckoutSession([id]);
-                            if (data.url) window.location.href = data.url;
-                          } catch (err) {
-                            toast.error(err.response?.data?.message || 'Failed');
-                          } finally { setEnrollLoading(false); }
-                        }}
-                        disabled={enrollLoading || user?.role === 'instructor'}
-                        className="btn-secondary w-full !py-3 text-sm font-medium disabled:opacity-50"
-                      >
-                        Buy Now
-                      </button>
-                    )}
+                    <button onClick={handleEnroll} disabled={enrollLoading || user?.role === 'instructor'} className="btn-primary w-full !py-3 flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-50">
+                      {enrollLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : course.price > 0 ? <><ShoppingCart className="w-4 h-4" /> Enroll — ${course.price}</> : 'Enroll Now — It\'s Free'}
+                    </button>
+
                   </>
                 )}
                 <div className="flex gap-2">

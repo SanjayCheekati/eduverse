@@ -66,10 +66,6 @@ export const getMySubmissions = () => API.get('/submissions/me');
 export const getInstructorSubmissions = () => API.get('/submissions/instructor');
 export const gradeSubmission = (id, data) => API.put(`/submissions/${id}/grade`, data);
 
-// Payments
-export const createCheckoutSession = (courseIds) => API.post('/payments/create-checkout-session', { courseIds });
-export const verifyPayment = (sessionId) => API.get(`/payments/verify/${sessionId}`);
-
 // Quizzes
 export const getCourseQuizzes = (courseId) => API.get(`/quizzes/course/${courseId}`);
 export const createQuiz = (data) => API.post('/quizzes', data);

@@ -114,11 +114,18 @@ const CourseCatalog = () => {
               <SlidersHorizontal className="w-4 h-4" />
               Filters
             </button>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="glass-input !py-3 text-sm">
-              {sortOptions.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="glass-input !py-3 text-sm pr-9 appearance-none bg-dark-800 text-white/80 border border-white/[0.08] rounded-xl cursor-pointer min-w-[180px]"
+              >
+                {sortOptions.map((o) => (
+                  <option key={o.value} value={o.value} className="bg-dark-800 text-white/80">{o.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+            </div>
           </div>
         </div>
 
