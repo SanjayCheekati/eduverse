@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, DollarSign, TrendingUp, ClipboardList } from 'lucide-react';
+import { BookOpen, Users, TrendingUp, ClipboardList } from 'lucide-react';
 import { getInstructorStats } from '../../utils/api';
 import PageTransition from '../../components/ui/PageTransition';
 import AnimatedCounter from '../../components/ui/AnimatedCounter';
@@ -16,7 +16,7 @@ const InstructorAnalytics = () => {
         const { data } = await getInstructorStats();
         setStats(data.stats);
       } catch {
-        setStats({ totalCourses: 0, publishedCourses: 0, totalStudents: 0, pendingSubmissions: 0, totalRevenue: 0 });
+        setStats({ totalCourses: 0, publishedCourses: 0, totalStudents: 0, pendingSubmissions: 0 });
       } finally {
         setLoading(false);
       }
@@ -30,7 +30,6 @@ const InstructorAnalytics = () => {
     { label: 'Total Courses', value: stats?.totalCourses || 0, icon: BookOpen, color: 'from-blue-500 to-indigo-600' },
     { label: 'Published', value: stats?.publishedCourses || 0, icon: TrendingUp, color: 'from-emerald-500 to-green-500' },
     { label: 'Total Students', value: stats?.totalStudents || 0, icon: Users, color: 'from-purple-500 to-pink-500' },
-    { label: 'Revenue', value: stats?.totalRevenue || 0, prefix: '$', icon: DollarSign, color: 'from-amber-500 to-orange-500' },
     { label: 'Pending Reviews', value: stats?.pendingSubmissions || 0, icon: ClipboardList, color: 'from-red-500 to-rose-500' },
   ];
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Users, BookOpen, DollarSign, TrendingUp, Activity, ShieldCheck,
+  Users, BookOpen, TrendingUp, Activity, ShieldCheck,
   ArrowUpRight, UserPlus, Eye
 } from 'lucide-react';
 import { getAdminStats } from '../../utils/api';
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
         setStats(data);
       } catch {
         setStats({
-          totalUsers: 0, totalCourses: 0, totalEnrollments: 0, totalRevenue: 0,
+          totalUsers: 0, totalCourses: 0, totalEnrollments: 0,
           usersByRole: { student: 0, instructor: 0, admin: 0 },
           monthlyData: [],
           recentUsers: [],
@@ -114,7 +114,6 @@ const AdminDashboard = () => {
     { label: 'Total Users', value: stats?.totalUsers || 0, icon: Users, color: 'from-blue-500 to-indigo-600' },
     { label: 'Total Courses', value: stats?.totalCourses || 0, icon: BookOpen, color: 'from-purple-500 to-pink-500' },
     { label: 'Enrollments', value: stats?.totalEnrollments || 0, icon: TrendingUp, color: 'from-emerald-500 to-green-500' },
-    { label: 'Revenue', value: stats?.totalRevenue || 0, prefix: '$', icon: DollarSign, color: 'from-amber-500 to-orange-500' },
   ];
 
   return (
@@ -127,7 +126,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {statCards.map((s, idx) => (
           <motion.div key={idx} variants={fadeUp}>
             <div className="glass-card group hover:scale-[1.02] transition-transform duration-500">

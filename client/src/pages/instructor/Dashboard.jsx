@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  BookOpen, Users, TrendingUp, DollarSign, Star, PlusCircle,
+  BookOpen, Users, TrendingUp, Star, PlusCircle,
   ChevronRight, ArrowUpRight, BarChart3, ClipboardList, Eye
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -34,7 +34,7 @@ const InstructorDashboard = () => {
         setStats(statsRes.data.stats || statsRes.data);
       } catch {
         setCourses([]);
-        setStats({ totalCourses: 0, totalStudents: 0, totalRevenue: 0, avgRating: 0, pendingSubmissions: 0 });
+        setStats({ totalCourses: 0, totalStudents: 0, avgRating: 0, pendingSubmissions: 0 });
       } finally {
         setLoading(false);
       }
@@ -47,7 +47,6 @@ const InstructorDashboard = () => {
   const statCards = [
     { label: 'Total Courses', value: stats?.totalCourses || courses.length, icon: BookOpen, color: 'from-blue-500 to-indigo-600' },
     { label: 'Total Students', value: stats?.totalStudents || 0, icon: Users, color: 'from-emerald-500 to-green-500' },
-    { label: 'Revenue', value: stats?.totalRevenue || 0, prefix: '$', icon: DollarSign, color: 'from-amber-500 to-orange-500' },
     { label: 'Avg Rating', value: stats?.avgRating || 0, decimals: 1, icon: Star, color: 'from-purple-500 to-pink-500' },
   ];
 
@@ -66,7 +65,7 @@ const InstructorDashboard = () => {
       </div>
 
       {/* Stats */}
-      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <motion.div variants={container} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {statCards.map((s, idx) => (
           <motion.div key={idx} variants={fadeUp}>
             <div className="glass-card group hover:scale-[1.02] transition-transform duration-500">
@@ -110,7 +109,6 @@ const InstructorDashboard = () => {
                     <th>Students</th>
                     <th>Rating</th>
                     <th>Status</th>
-                    <th>Revenue</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -140,9 +138,6 @@ const InstructorDashboard = () => {
                         <span className={`badge text-xs ${course.isPublished ? 'badge-success' : 'badge-warning'}`}>
                           {course.isPublished ? 'Published' : 'Draft'}
                         </span>
-                      </td>
-                      <td>
-                        <span className="text-sm text-white/60">${(course.price || 0) * (course.enrollmentCount || 0)}</span>
                       </td>
                     </tr>
                   ))}
