@@ -109,10 +109,7 @@ const Wishlist = () => {
                         {course.price === 0 ? (
                           <span className="text-lg font-bold text-emerald-400">Free</span>
                         ) : (
-                          <div className="text-right">
-                            <p className="text-lg font-bold text-white">${Math.round(course.price * 0.82 * 100) / 100}</p>
-                            <p className="text-xs text-white/20 line-through">${course.price}</p>
-                          </div>
+                          <p className="text-lg font-bold text-white">${course.price}</p>
                         )}
                         <button onClick={() => handleAddToCart(course._id)} className="btn-primary text-xs !py-2 !px-4 flex items-center gap-1.5">
                           <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart

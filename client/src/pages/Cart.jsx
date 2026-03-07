@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Star, Trash2, BookOpen, Shield, Tag, CreditCard, Zap } from 'lucide-react';
-import { getCart, removeFromCart, enrollCourse } from '../utils/api';
+import { getCart, removeFromCart, enrollCourse, createCheckoutSession } from '../utils/api';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
 import toast from 'react-hot-toast';
@@ -40,20 +40,36 @@ const Cart = () => {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      for (const course of items) {
-        await enrollCourse(course._id);
+      const courseIds = items.map(c => c._id);
+      const freeItems = items.filter(c => !c.price || c.price === 0);
+      const paidItems = items.filter(c => c.price > 0);
+
+      if (paidItems.length > 0) {
+        // Redirect to Stripe Checkout for paid courses
+        const { data } = await createCheckoutSession(courseIds);
+        if (data.free) {
+          // All turned out to be free
+          toast.success(data.message);
+          setItems([]);
+          navigate('/student/my-courses');
+        } else if (data.url) {
+          window.location.href = data.url;
+        }
+      } else {
+        // All free — enroll directly
+        for (const course of freeItems) {
+          await enrollCourse(course._id);
+        }
+        toast.success(`Enrolled in ${freeItems.length} free course(s)!`);
+        setItems([]);
+        navigate('/student/my-courses');
       }
-      toast.success(`Enrolled in ${items.length} course${items.length > 1 ? 's' : ''}!`);
-      setItems([]);
-      navigate('/student/my-courses');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Checkout failed');
     } finally { setCheckingOut(false); }
   };
 
-  const totalOriginal = items.reduce((s, c) => s + (c.price || 0), 0);
-  const totalDiscounted = items.reduce((s, c) => s + Math.round((c.price || 0) * 0.82 * 100) / 100, 0);
-  const savings = totalOriginal - totalDiscounted;
+  const totalPrice = items.reduce((s, c) => s + (c.price || 0), 0);
 
   if (loading) return <Loader />;
 
@@ -113,10 +129,7 @@ const Cart = () => {
                           {course.price === 0 ? (
                             <span className="font-bold text-emerald-400">Free</span>
                           ) : (
-                            <div className="text-right">
-                              <p className="text-base font-bold text-white">${Math.round(course.price * 0.82 * 100) / 100}</p>
-                              <p className="text-xs text-white/20 line-through">${course.price}</p>
-                            </div>
+                            <p className="text-base font-bold text-white">${course.price}</p>
                           )}
                           <button onClick={() => handleRemove(course._id)} className="text-xs text-white/20 hover:text-red-400 transition flex items-center gap-1">
                             <Trash2 className="w-3 h-3" /> Remove
@@ -135,17 +148,9 @@ const Cart = () => {
                 <h2 className="text-lg font-bold text-white mb-5">Total:</h2>
 
                 <div className="space-y-3 mb-5">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/40">Original Price:</span>
-                    <span className="text-white/30 line-through">${totalOriginal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/40">Discounts:</span>
-                    <span className="text-emerald-400">-${savings.toFixed(2)}</span>
-                  </div>
                   <div className="border-t border-white/5 pt-3 flex justify-between">
                     <span className="text-white font-semibold">Total:</span>
-                    <span className="text-2xl font-bold text-white">${totalDiscounted.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-white">${totalPrice.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -161,13 +166,7 @@ const Cart = () => {
                   )}
                 </button>
 
-                {savings > 0 && (
-                  <div className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                    <p className="text-xs text-emerald-400 flex items-center gap-1.5">
-                      <Tag className="w-3.5 h-3.5" /> You're saving <strong>${savings.toFixed(2)}</strong> on this purchase!
-                    </p>
-                  </div>
-                )}
+
 
                 <div className="mt-4 pt-4 border-t border-white/5 text-center space-y-2">
                   <p className="text-xs text-white/20 flex items-center justify-center gap-1.5">

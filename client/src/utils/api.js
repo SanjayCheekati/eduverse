@@ -66,6 +66,16 @@ export const getMySubmissions = () => API.get('/submissions/me');
 export const getInstructorSubmissions = () => API.get('/submissions/instructor');
 export const gradeSubmission = (id, data) => API.put(`/submissions/${id}/grade`, data);
 
+// Payments
+export const createCheckoutSession = (courseIds) => API.post('/payments/create-checkout-session', { courseIds });
+export const verifyPayment = (sessionId) => API.get(`/payments/verify/${sessionId}`);
+
+// Quizzes
+export const getCourseQuizzes = (courseId) => API.get(`/quizzes/course/${courseId}`);
+export const createQuiz = (data) => API.post('/quizzes', data);
+export const submitQuiz = (quizId, data) => API.post(`/quizzes/${quizId}/submit`, data);
+export const getQuizResults = (quizId) => API.get(`/quizzes/${quizId}/results`);
+
 // Users (Admin)
 export const getUsers = (params) => API.get('/users', { params });
 export const updateUserRole = (id, role) => API.put(`/users/${id}/role`, { role });

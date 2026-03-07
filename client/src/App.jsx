@@ -29,6 +29,8 @@ import CertificateView from './pages/student/CertificateView';
 import InstructorDashboard from './pages/instructor/Dashboard';
 import InstructorCourses from './pages/instructor/ManageCourses';
 import CreateCourse from './pages/instructor/CreateCourse';
+import EditCourse from './pages/instructor/EditCourse';
+import ManageQuizzes from './pages/instructor/ManageQuizzes';
 import Submissions from './pages/instructor/Submissions';
 import InstructorAnalytics from './pages/instructor/Analytics';
 
@@ -94,6 +96,8 @@ function AppRoutes() {
           <Route index element={<InstructorDashboard />} />
           <Route path="courses" element={<InstructorCourses />} />
           <Route path="create-course" element={<CreateCourse />} />
+          <Route path="edit-course/:courseId" element={<EditCourse />} />
+          <Route path="quizzes/:courseId" element={<ManageQuizzes />} />
           <Route path="submissions" element={<Submissions />} />
           <Route path="analytics" element={<InstructorAnalytics />} />
         </Route>

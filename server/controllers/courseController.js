@@ -36,11 +36,13 @@ const createCourse = async (req, res) => {
 // @route   GET /api/courses
 const getCourses = async (req, res) => {
   try {
-    const { page = 1, limit = 12, category, level, search, sort } = req.query;
+    const { page = 1, limit = 12, category, level, search, sort, priceType } = req.query;
 
     const query = { isPublished: true };
     if (category && category !== 'All') query.category = category;
     if (level && level !== 'All') query.level = level;
+    if (priceType === 'free') query.price = 0;
+    if (priceType === 'paid') query.price = { $gt: 0 };
     if (search) {
       const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       query.$or = [

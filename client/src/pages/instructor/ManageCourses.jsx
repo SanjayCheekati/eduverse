@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   BookOpen, PlusCircle, Edit, Trash2, Eye, EyeOff, Star,
-  Users, MoreVertical, Search
+  Users, MoreVertical, Search, HelpCircle
 } from 'lucide-react';
 import { getInstructorCourses, deleteCourse, togglePublish } from '../../utils/api';
 import PageTransition from '../../components/ui/PageTransition';
@@ -14,6 +14,7 @@ const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCourses();
@@ -122,6 +123,20 @@ const ManageCourses = () => {
                   </div>
 
                   <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition">
+                    <button
+                      onClick={() => navigate(`/instructor/edit-course/${course._id}`)}
+                      className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-primary-400 transition"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => navigate(`/instructor/quizzes/${course._id}`)}
+                      className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-purple-400 transition"
+                      title="Quizzes"
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleTogglePublish(course._id)}
                       className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition"

@@ -14,6 +14,11 @@ const enrollCourse = async (req, res) => {
       return res.status(400).json({ message: 'Cannot enroll in unpublished course' });
     }
 
+    // Block free enrollment on paid courses — must go through Stripe
+    if (course.price > 0) {
+      return res.status(402).json({ message: 'This is a paid course. Please complete payment through checkout.' });
+    }
+
     const existing = await Enrollment.findOne({
       student: req.user._id,
       course: req.params.courseId

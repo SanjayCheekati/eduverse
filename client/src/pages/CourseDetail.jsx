@@ -7,7 +7,7 @@ import {
   ShoppingCart, Share2, ThumbsUp, AlertCircle, Monitor, Download,
   Smartphone, Infinity, ChevronRight, MessageSquare, TrendingUp, Zap
 } from 'lucide-react';
-import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist, addToCart } from '../utils/api';
+import { getCourse, enrollCourse, checkEnrollment, getCourseReviews, createReview, markReviewHelpful, toggleWishlist, checkWishlist, addToCart, createCheckoutSession } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import PageTransition from '../components/ui/PageTransition';
 import Loader from '../components/ui/Loader';
@@ -164,8 +164,7 @@ const CourseDetail = () => {
   if (!course) return null;
 
   const totalModules = course.modules?.length || 0;
-  const discountedPrice = course.price > 0 ? Math.round(course.price * 0.82 * 100) / 100 : 0;
-  const originalPrice = course.price;
+  const coursePrice = course.price;
   const lastUpdated = new Date(course.updatedAt || course.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
@@ -523,16 +522,7 @@ const CourseDetail = () => {
                 {course.price === 0 ? (
                   <p className="text-3xl font-bold text-emerald-400">Free</p>
                 ) : (
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-white">${discountedPrice}</p>
-                    <p className="text-base text-white/30 line-through">${originalPrice}</p>
-                    <span className="badge badge-success text-xs">18% off</span>
-                  </div>
-                )}
-                {course.price > 0 && (
-                  <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> <strong>2 days</strong> left at this price!
-                  </p>
+                  <p className="text-3xl font-bold text-white">${coursePrice}</p>
                 )}
               </div>
 
@@ -554,7 +544,20 @@ const CourseDetail = () => {
                       </button>
                     )}
                     {course.price > 0 && (
-                      <button onClick={handleEnroll} disabled={enrollLoading || user?.role === 'instructor'} className="btn-secondary w-full !py-3 text-sm font-medium disabled:opacity-50">
+                      <button
+                        onClick={async () => {
+                          if (!user) { navigate('/login'); return; }
+                          setEnrollLoading(true);
+                          try {
+                            const { data } = await createCheckoutSession([id]);
+                            if (data.url) window.location.href = data.url;
+                          } catch (err) {
+                            toast.error(err.response?.data?.message || 'Failed');
+                          } finally { setEnrollLoading(false); }
+                        }}
+                        disabled={enrollLoading || user?.role === 'instructor'}
+                        className="btn-secondary w-full !py-3 text-sm font-medium disabled:opacity-50"
+                      >
                         Buy Now
                       </button>
                     )}

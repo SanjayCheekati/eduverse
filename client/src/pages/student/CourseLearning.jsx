@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Play, CheckCircle2,
   Clock, BookOpen, Award, Lock, FileText, Download, ExternalLink,
-  Menu, X, BarChart3
+  Menu, X, BarChart3, Send, Upload
 } from 'lucide-react';
-import { getEnrollmentDetail, updateProgress } from '../../utils/api';
+import { getEnrollmentDetail, updateProgress, createSubmission, getMySubmissions, getCourseQuizzes, submitQuiz } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -23,6 +23,15 @@ const CourseLearning = () => {
   const [expandedModules, setExpandedModules] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completing, setCompleting] = useState(false);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
+  const [submitForm, setSubmitForm] = useState({ title: '', description: '', content: '' });
+  const [quizzes, setQuizzes] = useState([]);
+  const [activeQuiz, setActiveQuiz] = useState(null);
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [quizResult, setQuizResult] = useState(null);
+  const [submittingQuiz, setSubmittingQuiz] = useState(false);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -61,6 +70,16 @@ const CourseLearning = () => {
       }
     };
     fetchData();
+
+    // Load submissions
+    getMySubmissions().then(({ data }) => {
+      setSubmissions((data.submissions || []).filter(s => s.course?._id === courseId || s.course === courseId));
+    }).catch(() => {});
+
+    // Load quizzes
+    getCourseQuizzes(courseId).then(({ data }) => {
+      setQuizzes(data.quizzes || []);
+    }).catch(() => {});
   }, [courseId, navigate]);
 
   if (loading || !course || !enrollment) {
@@ -414,6 +433,217 @@ const CourseLearning = () => {
                   >
                     Next Lesson <ChevronRight className="w-4 h-4" />
                   </button>
+                </div>
+
+                {/* Quizzes */}
+                {quizzes.length > 0 && (
+                  <div className="mt-8 pt-6 border-t border-white/[0.04]">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-4">
+                      <Award className="w-4 h-4 text-primary-400" /> Course Quizzes
+                    </h3>
+
+                    {!activeQuiz && !quizResult && (
+                      <div className="space-y-2">
+                        {quizzes.map(q => (
+                          <div key={q._id} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-white/70 font-medium">{q.title}</p>
+                              {q.description && <p className="text-xs text-white/30 mt-1">{q.description}</p>}
+                              <p className="text-[10px] text-white/20 mt-1">{q.questions?.length || '?'} questions{q.timeLimit ? ` · ${q.timeLimit} min` : ''}</p>
+                            </div>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const { data } = await getCourseQuizzes(courseId);
+                                  const full = (data.quizzes || []).find(fq => fq._id === q._id);
+                                  if (full) {
+                                    setActiveQuiz(full);
+                                    setQuizAnswers({});
+                                    setQuizResult(null);
+                                  }
+                                } catch { toast.error('Could not load quiz'); }
+                              }}
+                              className="text-xs bg-primary-500/10 text-primary-400 px-3 py-1.5 rounded-lg hover:bg-primary-500/20 transition"
+                            >
+                              Take Quiz
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {activeQuiz && !quizResult && (
+                      <div className="glass-card space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-white">{activeQuiz.title}</h4>
+                          <button onClick={() => { setActiveQuiz(null); setQuizAnswers({}); }} className="text-xs text-white/30 hover:text-white/60 transition">Cancel</button>
+                        </div>
+                        {activeQuiz.questions?.map((q, qi) => (
+                          <div key={qi} className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                            <p className="text-sm text-white/70 mb-2">
+                              <span className="text-primary-400 font-medium">Q{qi + 1}.</span> {q.question}
+                            </p>
+                            <div className="space-y-1.5">
+                              {q.options.map((opt, oi) => (
+                                <button
+                                  key={oi}
+                                  onClick={() => setQuizAnswers(prev => ({ ...prev, [qi]: oi }))}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-xs transition ${
+                                    quizAnswers[qi] === oi
+                                      ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30'
+                                      : 'bg-white/[0.02] text-white/50 border border-white/[0.04] hover:bg-white/[0.04]'
+                                  }`}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          onClick={async () => {
+                            const total = activeQuiz.questions?.length || 0;
+                            const answersArr = Array.from({ length: total }, (_, i) => quizAnswers[i] ?? -1);
+                            if (answersArr.some(a => a === -1)) {
+                              toast.error('Please answer all questions');
+                              return;
+                            }
+                            setSubmittingQuiz(true);
+                            try {
+                              const { data } = await submitQuiz(activeQuiz._id, { answers: answersArr });
+                              setQuizResult(data);
+                              setActiveQuiz(null);
+                              toast.success(data.passed ? 'Quiz passed!' : 'Quiz completed');
+                            } catch (err) {
+                              toast.error(err.response?.data?.message || 'Failed to submit quiz');
+                            } finally {
+                              setSubmittingQuiz(false);
+                            }
+                          }}
+                          disabled={submittingQuiz}
+                          className="btn-primary flex items-center gap-2 text-sm disabled:opacity-50"
+                        >
+                          {submittingQuiz ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Send className="w-4 h-4" /> Submit Quiz</>}
+                        </button>
+                      </div>
+                    )}
+
+                    {quizResult && (
+                      <div className="glass-card space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-white">Quiz Results</h4>
+                          <button onClick={() => setQuizResult(null)} className="text-xs text-primary-400 hover:text-primary-300 transition">Back to Quizzes</button>
+                        </div>
+                        <div className="text-center py-4">
+                          <p className={`text-3xl font-bold ${quizResult.passed ? 'text-emerald-400' : 'text-red-400'}`}>{quizResult.percentage}%</p>
+                          <p className="text-sm text-white/50 mt-1">{quizResult.score}/{quizResult.total} correct</p>
+                          <p className={`text-xs mt-2 px-3 py-1 rounded-full inline-block ${quizResult.passed ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                            {quizResult.passed ? 'Passed' : 'Not Passed'} — need {quizResult.passingScore}%
+                          </p>
+                        </div>
+                        {quizResult.results?.map((r, ri) => (
+                          <div key={ri} className={`p-3 rounded-xl border ${r.isCorrect ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-red-500/5 border-red-500/10'}`}>
+                            <p className="text-sm text-white/70 mb-1"><span className="font-medium">Q{ri + 1}.</span> {r.question}</p>
+                            <p className="text-xs text-white/40">Your answer: <span className={r.isCorrect ? 'text-emerald-400' : 'text-red-400'}>{r.options[r.yourAnswer]}</span></p>
+                            {!r.isCorrect && <p className="text-xs text-emerald-400/70 mt-0.5">Correct: {r.options[r.correctAnswer]}</p>}
+                            {r.explanation && <p className="text-xs text-white/25 mt-1 italic">{r.explanation}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Assignment Submission */}
+                <div className="mt-8 pt-6 border-t border-white/[0.04]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                      <Upload className="w-4 h-4 text-primary-400" /> Submit Assignment
+                    </h3>
+                    <button
+                      onClick={() => setShowSubmitForm(!showSubmitForm)}
+                      className="text-xs text-primary-400 hover:text-primary-300 transition"
+                    >
+                      {showSubmitForm ? 'Cancel' : 'New Submission'}
+                    </button>
+                  </div>
+
+                  {showSubmitForm && (
+                    <div className="glass-card mb-4 space-y-3">
+                      <input
+                        type="text"
+                        value={submitForm.title}
+                        onChange={e => setSubmitForm(p => ({ ...p, title: e.target.value }))}
+                        className="glass-input w-full"
+                        placeholder="Assignment title..."
+                      />
+                      <input
+                        type="text"
+                        value={submitForm.description}
+                        onChange={e => setSubmitForm(p => ({ ...p, description: e.target.value }))}
+                        className="glass-input w-full"
+                        placeholder="Brief description..."
+                      />
+                      <textarea
+                        value={submitForm.content}
+                        onChange={e => setSubmitForm(p => ({ ...p, content: e.target.value }))}
+                        className="glass-input w-full min-h-[100px] resize-y"
+                        placeholder="Your answer or submission content..."
+                      />
+                      <button
+                        onClick={async () => {
+                          if (!submitForm.title || !submitForm.content) {
+                            toast.error('Title and content are required');
+                            return;
+                          }
+                          setSubmitting(true);
+                          try {
+                            const { data } = await createSubmission({
+                              courseId,
+                              title: submitForm.title,
+                              description: submitForm.description,
+                              content: submitForm.content,
+                            });
+                            setSubmissions(prev => [data.submission, ...prev]);
+                            setSubmitForm({ title: '', description: '', content: '' });
+                            setShowSubmitForm(false);
+                            toast.success('Assignment submitted!');
+                          } catch (err) {
+                            toast.error(err.response?.data?.message || 'Failed to submit');
+                          } finally {
+                            setSubmitting(false);
+                          }
+                        }}
+                        disabled={submitting}
+                        className="btn-primary flex items-center gap-2 text-sm disabled:opacity-50"
+                      >
+                        {submitting ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Send className="w-4 h-4" /> Submit</>}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Past submissions for this course */}
+                  {submissions.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-white/30 mb-2">Your submissions ({submissions.length})</p>
+                      {submissions.map(sub => (
+                        <div key={sub._id} className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm text-white/70 font-medium">{sub.assignment?.title || sub.title}</p>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                              sub.status === 'graded' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                            }`}>
+                              {sub.status === 'graded' ? `Graded: ${sub.grade?.score}/100` : 'Pending'}
+                            </span>
+                          </div>
+                          {sub.grade?.feedback && (
+                            <p className="text-xs text-white/30 mt-1">Feedback: {sub.grade.feedback}</p>
+                          )}
+                          <p className="text-[10px] text-white/20 mt-1">{new Date(sub.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

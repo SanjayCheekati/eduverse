@@ -24,7 +24,7 @@ const CreateCourse = () => {
     description: '',
     shortDescription: '',
     category: 'Web Development',
-    level: 'beginner',
+    level: 'Beginner',
     price: 0,
     thumbnail: '',
     tags: '',
@@ -223,9 +223,9 @@ const CreateCourse = () => {
               <div>
                 <label className="block text-sm font-medium text-white/60 mb-2">Level</label>
                 <select value={form.level} onChange={(e) => updateField('level', e.target.value)} className="glass-input w-full">
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
                 </select>
               </div>
             </div>

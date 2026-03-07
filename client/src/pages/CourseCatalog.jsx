@@ -33,6 +33,7 @@ const CourseCatalog = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [level, setLevel] = useState('All');
+  const [priceFilter, setPriceFilter] = useState('All');
   const [sort, setSort] = useState('-createdAt');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -42,7 +43,7 @@ const CourseCatalog = () => {
 
   useEffect(() => {
     fetchCourses();
-  }, [category, level, sort, page]);
+  }, [category, level, sort, page, priceFilter]);
 
   // Debounced auto-search as user types
   useEffect(() => {
@@ -60,6 +61,8 @@ const CourseCatalog = () => {
       const params = { page, limit: 12, sort };
       if (category !== 'All') params.category = category;
       if (level !== 'All') params.level = level.toLowerCase();
+      if (priceFilter === 'Free') params.priceType = 'free';
+      if (priceFilter === 'Paid') params.priceType = 'paid';
       if (search) params.search = search;
       const { data } = await getCourses(params);
       setCourses(data.courses || []);
@@ -132,7 +135,7 @@ const CourseCatalog = () => {
               <div className="glass-card">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-white">Filters</h3>
-                  <button onClick={() => { setCategory('All'); setLevel('All'); }} className="text-xs text-primary-400 hover:text-primary-300 transition">
+                  <button onClick={() => { setCategory('All'); setLevel('All'); setPriceFilter('All'); }} className="text-xs text-primary-400 hover:text-primary-300 transition">
                     Clear All
                   </button>
                 </div>
@@ -171,6 +174,25 @@ const CourseCatalog = () => {
                           }`}
                         >
                           {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-white/40 mb-2">Price</p>
+                    <div className="flex gap-2">
+                      {['All', 'Free', 'Paid'].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => { setPriceFilter(p); setPage(1); }}
+                          className={`px-3 py-1.5 rounded-lg text-xs transition ${
+                            priceFilter === p
+                              ? 'bg-primary-500 text-white'
+                              : 'bg-white/5 text-white/40 hover:text-white/60 hover:bg-white/[0.08]'
+                          }`}
+                        >
+                          {p}
                         </button>
                       ))}
                     </div>
@@ -250,8 +272,7 @@ const CourseCatalog = () => {
                             <span className="text-sm font-bold text-emerald-400">Free</span>
                           ) : (
                             <div className="flex items-baseline gap-2">
-                              <span className="text-base font-bold text-white">${Math.round(course.price * 0.82 * 100) / 100}</span>
-                              <span className="text-xs text-white/20 line-through">${course.price}</span>
+                              <span className="text-base font-bold text-white">${course.price}</span>
                             </div>
                           )}
                         </div>

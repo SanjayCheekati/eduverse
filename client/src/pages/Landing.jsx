@@ -332,8 +332,7 @@ const CoursesPreview = () => {
                         <span className="text-lg font-bold text-emerald-400">Free</span>
                       ) : (
                         <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold text-white">${Math.round(course.price * 0.82 * 100) / 100}</span>
-                          <span className="text-xs text-white/20 line-through">${course.price}</span>
+                          <span className="text-lg font-bold text-white">${course.price}</span>
                         </div>
                       )}
                       <span className="text-sm text-primary-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
