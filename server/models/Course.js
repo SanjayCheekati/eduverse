@@ -1,5 +1,74 @@
 const mongoose = require('mongoose');
 
+const IST_TIMEZONE = 'Asia/Kolkata';
+
+const formatDateToIST = (value) => {
+  if (!value) return null;
+  return new Intl.DateTimeFormat('en-IN', {
+    timeZone: IST_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(value);
+};
+
+const applyISTTimestamps = (schema) => {
+  schema.add({
+    createdAtIST: {
+      type: String,
+      default: () => formatDateToIST(new Date())
+    },
+    updatedAtIST: {
+      type: String,
+      default: () => formatDateToIST(new Date())
+    }
+  });
+
+  schema.pre('save', function (next) {
+    if (!this.createdAtIST) {
+      this.createdAtIST = formatDateToIST(this.createdAt || new Date());
+    }
+    this.updatedAtIST = formatDateToIST(new Date());
+    next();
+  });
+
+  schema.pre('findOneAndUpdate', function (next) {
+    const update = this.getUpdate() || {};
+    const istNow = formatDateToIST(new Date());
+
+    if (update.$set) {
+      update.$set.updatedAtIST = istNow;
+    } else {
+      update.$set = { updatedAtIST: istNow };
+    }
+
+    this.setUpdate(update);
+    next();
+  });
+
+  schema.set('toJSON', {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.createdAtIST = formatDateToIST(ret.createdAt);
+      ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+      return ret;
+    }
+  });
+
+  schema.set('toObject', {
+    virtuals: true,
+    transform: (_, ret) => {
+      ret.createdAtIST = formatDateToIST(ret.createdAt);
+      ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+      return ret;
+    }
+  });
+};
+
 const lessonSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -31,7 +100,11 @@ const lessonSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
+}, {
+  timestamps: true
 });
+
+applyISTTimestamps(lessonSchema);
 
 const moduleSchema = new mongoose.Schema({
   title: {
@@ -48,7 +121,11 @@ const moduleSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
+}, {
+  timestamps: true
 });
+
+applyISTTimestamps(moduleSchema);
 
 const courseSchema = new mongoose.Schema({
   title: {
@@ -126,9 +203,57 @@ const courseSchema = new mongoose.Schema({
   }],
   whatYouWillLearn: [{
     type: String
-  }]
+  }],
+  createdAtIST: {
+    type: String,
+    default: () => formatDateToIST(new Date())
+  },
+  updatedAtIST: {
+    type: String,
+    default: () => formatDateToIST(new Date())
+  }
 }, {
   timestamps: true
+});
+
+courseSchema.pre('save', function (next) {
+  if (!this.createdAtIST) {
+    this.createdAtIST = formatDateToIST(this.createdAt || new Date());
+  }
+  this.updatedAtIST = formatDateToIST(new Date());
+  next();
+});
+
+courseSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() || {};
+  const istNow = formatDateToIST(new Date());
+
+  if (update.$set) {
+    update.$set.updatedAtIST = istNow;
+  } else {
+    update.$set = { updatedAtIST: istNow };
+  }
+
+  this.setUpdate(update);
+  next();
+});
+
+courseSchema.set('toJSON', {
+  virtuals: true,
+  transform: (_, ret) => {
+    ret.createdAtIST = formatDateToIST(ret.createdAt);
+    ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+    return ret;
+  }
+});
+
+courseSchema.set('toObject', {
+  virtuals: true,
+  transform: (_, ret) => {
+    ret.createdAtIST = formatDateToIST(ret.createdAt);
+    ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+    return ret;
+  }
 });
 
 courseSchema.index({ title: 'text', description: 'text', tags: 'text' });

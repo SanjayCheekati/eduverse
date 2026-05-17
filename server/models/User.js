@@ -1,6 +1,22 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const IST_TIMEZONE = 'Asia/Kolkata';
+
+const formatDateToIST = (value) => {
+  if (!value) return null;
+  return new Intl.DateTimeFormat('en-IN', {
+    timeZone: IST_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(value);
+};
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -71,9 +87,57 @@ const userSchema = new mongoose.Schema({
   cart: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
-  }]
+  }],
+  createdAtIST: {
+    type: String,
+    default: () => formatDateToIST(new Date())
+  },
+  updatedAtIST: {
+    type: String,
+    default: () => formatDateToIST(new Date())
+  }
 }, {
   timestamps: true
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.createdAtIST) {
+    this.createdAtIST = formatDateToIST(this.createdAt || new Date());
+  }
+  this.updatedAtIST = formatDateToIST(new Date());
+  next();
+});
+
+userSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() || {};
+  const istNow = formatDateToIST(new Date());
+
+  if (update.$set) {
+    update.$set.updatedAtIST = istNow;
+  } else {
+    update.$set = { updatedAtIST: istNow };
+  }
+
+  this.setUpdate(update);
+  next();
+});
+
+userSchema.set('toJSON', {
+  virtuals: true,
+  transform: (_, ret) => {
+    ret.createdAtIST = formatDateToIST(ret.createdAt);
+    ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+    return ret;
+  }
+});
+
+userSchema.set('toObject', {
+  virtuals: true,
+  transform: (_, ret) => {
+    ret.createdAtIST = formatDateToIST(ret.createdAt);
+    ret.updatedAtIST = formatDateToIST(ret.updatedAt);
+    return ret;
+  }
 });
 
 userSchema.index({ role: 1 });
